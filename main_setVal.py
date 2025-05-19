@@ -254,76 +254,130 @@ async def scrape_business(search_term, total):
             return BusinessList()
 
 
+# async def main():
+#     st.title("Google Maps Business Scraper")
+
+#     st.markdown("---")
+
+#     st.markdown(
+#         """
+#     <p style="font-size: 13px;color: aqua;">Enter search term  ( e.g. Coffee Shops in New York, United States  /  Restaurants in Sylhet, Bangladesh  ) for more accurate results</p>
+#     """,
+#         unsafe_allow_html=True,
+#     )
+#     search_term = st.text_input(
+#         "Enter search term",
+#         placeholder="e.g. Barber Shops in London United Kingdom")
+
+#     total_results = st.number_input("Enter number of results",
+#                                     min_value=1,
+#                                     max_value=1000,
+#                                     value=120)
+
+#     if st.button("Get Data"):
+#         if not search_term:
+#             st.error("Please enter a search term")
+#         else:
+
+#             with st.spinner("Fetching data..."):
+#                 start_time = time.time()
+#                 business_list = await scrape_business(search_term,
+#                                                       total_results)
+#                 elapsed_time = time.time() - start_time
+
+#                 current_datetime = datetime.datetime.now().strftime(
+#                     "%Y%m%d_%H%M%S")
+#                 search_for_filename = search_term.replace(' ', '_')
+
+#                 row_size = business_list.get_row_size()
+
+#                 excel_filename = f"({row_size}_Rows)__{current_datetime}__({search_for_filename})"
+
+#                 # Save to Excel and get the file path
+#                 excel_file_path = business_list.save_to_excel(excel_filename)
+
+#                 if excel_file_path:
+
+#                     st.success("Fetched completed!")
+
+#                     download_container = st.container()
+
+#                     with download_container:
+#                         st.markdown(
+#                             ""
+#                         )  # Add some space above the button for better separation
+#                         st.download_button(label="Download Excel File",
+#                                            data=open(excel_file_path,
+#                                                      'rb').read(),
+#                                            file_name=f"{excel_filename}.xlsx",
+#                                            mime="application/octet-stream")
+
+#                 else:
+#                     st.warning(
+#                         "No file to download. Please make sure to run the scraper first."
+#                     )
+
+#                 st.markdown(f"**File Name:** `{excel_filename}.xlsx`")
+#                 st.dataframe(business_list.dataframe())
+#                 st.markdown("---")
+#                 st.text(f"Elapsed Time: {elapsed_time:.2f} seconds")
+#                 st.markdown("---")
+
 async def main():
     st.title("Google Maps Business Scraper")
-
-    st.text("By Shakib Absar")
     st.markdown("---")
 
     st.markdown(
         """
-    <p style="font-size: 13px;color: aqua;">Enter search term  ( e.g. Coffee Shops in New York, United States  /  Restaurants in Sylhet, Bangladesh  ) for more accurate results</p>
-    """,
+        <p style="font-size: 13px;color: aqua;">Enter base search term (e.g. "Coffee Shops")</p>
+        """,
         unsafe_allow_html=True,
     )
-    search_term = st.text_input(
-        "Enter search term",
-        placeholder="e.g. Barber Shops in London United Kingdom")
+    base_search_term = st.text_input("Enter base search term", placeholder="e.g. Barber Shops")
 
-    total_results = st.number_input("Enter number of results",
-                                    min_value=1,
-                                    max_value=1000,
-                                    value=30)
+    total_results = st.number_input("Enter number of results", min_value=1, max_value=1000, value=50)
+
+    # Static ZIP code list
+    zip_codes = ['110001', '110002', '110003'
+    , '110004', '110005', '110006', '110007', '110008', '110010', '110011', '110012', '110013', '110014', '110015'
+    , '110016', '110017', '110018', '110019', '110020', '110021', '110022', '110023', '110024', '110025', '110026', '110027', '110028', '110029', '110030', '110031', '110032', '110033', '110034', '110035', '110036', '110037', '110038', '110039', '110040', '110041', '110042', '110043', '110044', '110045', '110046', '110047', '110048', '110049', '110051', '110052', '110053', '110054', '110055', '110056', '110057', '110058', '110059', '110060', '110061', '110062', '110063', '110064', '110065', '110066', '110067', '110071', '110072', '110073', '110081', '110082', '110083', '110084', '110091', '110092', '110093', '110094', '110096']
+
 
     if st.button("Get Data"):
-        if not search_term:
-            st.error("Please enter a search term")
-        else:
+        if not base_search_term:
+            st.error("Please enter a search term.")
+            return
 
-            with st.spinner("Fetching data..."):
-                start_time = time.time()
-                business_list = await scrape_business(search_term,
-                                                      total_results)
-                elapsed_time = time.time() - start_time
+        results = []
 
-                current_datetime = datetime.datetime.now().strftime(
-                    "%Y%m%d_%H%M%S")
-                search_for_filename = search_term.replace(' ', '_')
+        with st.spinner("Fetching data for each ZIP code..."):
+            for zip_code in zip_codes:
+                search_term = f"{base_search_term} {zip_code}"
+                st.info(f"Scraping for: {search_term}")
+                business_list = await scrape_business(search_term, total_results)
 
-                row_size = business_list.get_row_size()
+                if business_list.get_row_size() == 0:
+                    st.warning(f"No data found for ZIP: {zip_code}")
+                    continue
 
-                excel_filename = f"({row_size}_Rows)__{current_datetime}__({search_for_filename})"
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                sanitized_query = base_search_term.replace(" ", "_")
+                filename = f"{sanitized_query}_{zip_code}_{timestamp}"
 
-                # Save to Excel and get the file path
-                excel_file_path = business_list.save_to_excel(excel_filename)
+                excel_file_path = business_list.save_to_excel(filename)
+                results.append((filename, excel_file_path, business_list))
 
-                if excel_file_path:
+        st.success("Scraping complete!")
 
-                    st.success("Fetched completed!")
-
-                    download_container = st.container()
-
-                    with download_container:
-                        st.markdown(
-                            ""
-                        )  # Add some space above the button for better separation
-                        st.download_button(label="Download Excel File",
-                                           data=open(excel_file_path,
-                                                     'rb').read(),
-                                           file_name=f"{excel_filename}.xlsx",
-                                           mime="application/octet-stream")
-
-                else:
-                    st.warning(
-                        "No file to download. Please make sure to run the scraper first."
-                    )
-
-                st.markdown(f"**File Name:** `{excel_filename}.xlsx`")
-                st.dataframe(business_list.dataframe())
-                st.markdown("---")
-                st.text(f"Elapsed Time: {elapsed_time:.2f} seconds")
-                st.markdown("---")
-
+        for filename, file_path, data in results:
+            st.markdown(f"### 📄 {filename}.csv")
+            with open(file_path, 'rb') as f:
+                st.download_button(label=f"Download: {filename}.csv",
+                                   data=f,
+                                   file_name=f"{filename}.csv",
+                                   mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            st.dataframe(data.dataframe())
+            st.markdown("---")
 
 if __name__ == "__main__":
     asyncio.run(main())
