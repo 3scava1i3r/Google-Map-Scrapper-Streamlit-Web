@@ -324,7 +324,7 @@ async def scrape_business(search_term, total):
 #                 st.markdown("---")
 
 async def main():
-    st.title("Google Maps Business Scraper")
+    st.title("Google Maps Business Scraper Hald")
     st.markdown("---")
 
     st.markdown(
