@@ -338,7 +338,8 @@ async def main():
     total_results = st.number_input("Enter number of results", min_value=1, max_value=1000, value=50)
 
     # Static ZIP code list
-    zip_codes = [250001, 250002, 250003, 250004, 250005, 250103, 250110, 250502]
+    zip_codes = [250001, 250002, 250003, 250004]
+    # , 250005, 250103, 250110, 250502]
 
     
     
