@@ -255,7 +255,7 @@ async def scrape_business(search_term, total):
 
 
 # async def main():
-#     st.title("Google Maps Business Scraper Haldwani")
+#     st.title("Google Maps Business Scraper Meerut")
 
 #     st.markdown("---")
 
@@ -324,7 +324,7 @@ async def scrape_business(search_term, total):
 #                 st.markdown("---")
 
 async def main():
-    st.title("Google Maps Business Scraper Hald")
+    st.title("Google Maps Business Scraper Meerut")
     st.markdown("---")
 
     st.markdown(
@@ -338,7 +338,7 @@ async def main():
     total_results = st.number_input("Enter number of results", min_value=1, max_value=1000, value=50)
 
     # Static ZIP code list
-    zip_codes = [263139, 263140, 244715, 263126, 263159]
+    zip_codes = [250001, 250002, 250003, 250004, 250005, 250103, 250110, 250502]
 
     
     
